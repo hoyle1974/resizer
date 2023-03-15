@@ -1,0 +1,41 @@
+format_version: 10
+pipelines:
+  pingpong:
+    group: sample
+    label_template: ${COUNT}
+    lock_behavior: none
+    display_order: -1
+    materials:
+      git-589ea36:
+        git: https://github.com/hoyle1974/resizer.git
+        shallow_clone: false
+        auto_update: true
+        branch: main
+    stages:
+    - compile:
+        fetch_materials: true
+        keep_artifacts: true
+        clean_workspace: false
+        approval:
+          type: success
+          allow_only_on_success: false
+        jobs:
+          compile-pingpong:
+            elastic_profile_id: buildah
+            timeout: 0
+            artifacts:
+            - build:
+                source: resizer
+            tasks:
+            - exec:
+                arguments:
+                  - -c
+                  - compile.sh
+                command: /bin/bash
+                run_if: passed
+            - exec:
+                arguments:
+                  - -c
+                  - find .
+                command: /bin/bash
+                run_if: passed
