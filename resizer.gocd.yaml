@@ -39,3 +39,108 @@ pipelines:
                   - find .
                 command: /bin/bash
                 run_if: passed
+    - package:
+        fetch_materials: true
+        keep_artifacts: true
+        clean_workspace: false
+        approval:
+          type: success
+          allow_only_on_success: false
+        jobs:
+          package-resizer:
+            elastic_profile_id: buildah
+            timeout: 0
+            artifacts:
+            - build:
+                source: build
+            tasks:
+            - fetch:
+                pipeline: resizer
+                stage: compile
+                job: compile-resizer
+                source: resizer/
+            - exec:
+                arguments:
+                  - -c
+                  - pwd
+                command: /bin/bash
+                run_if: passed
+            - exec:
+                arguments:
+                  - -c
+                  - find .
+                command: /bin/bash
+                run_if: passed
+            - exec:
+                arguments:
+                  - -c
+                  - buildah bud -t resizer:${GO_PIPELINE_LABEL} -f Dockerfile .
+                command: /bin/bash
+                run_if: passed
+            - exec:
+                arguments:
+                  - -c
+                  - mkdir build && cd build && buildah push resizer:${GO_PIPELINE_LABEL} oci-archive:./resizer.tar:resizer:${GO_PIPELINE_LABEL}
+                command: /bin/bash
+                run_if: passed
+    - push:
+        fetch_materials: true
+        keep_artifacts: false
+        clean_workspace: false
+        approval:
+          type: success
+          allow_only_on_success: false
+        jobs:
+          push-resizer:
+            elastic_profile_id: buildah
+            timeout: 0
+            artifacts:
+            tasks:
+            - fetch:
+                pipeline: resizer
+                stage: package
+                job: package-resizer
+                source: build/
+            - exec:
+                arguments:
+                  - -c
+                  - buildah pull oci-archive:./build/resizer.tar 
+                command: /bin/bash
+                run_if: passed
+            - exec:
+                arguments:
+                  - -c
+                  - buildah login -u jstrohm -p ${DOCKER_PASSWORD} docker.io
+                command: /bin/bash
+                run_if: passed
+            - exec:
+                arguments:
+                  - -c
+                  - buildah push resizer:${GO_PIPELINE_LABEL} docker://jstrohm/resizer:${GO_PIPELINE_LABEL}
+                command: /bin/bash
+                run_if: passed
+    - deploy:
+        fetch_materials: true
+        keep_artifacts: false
+        clean_workspace: false
+        approval:
+          type: success
+          allow_only_on_success: false
+        jobs:
+          push-resizer:
+            elastic_profile_id: kubectl
+            timeout: 0
+            artifacts:
+            tasks:
+            - exec:
+                arguments:
+                  - -c
+                  - kubectl get pod -n default
+                command: /bin/bash
+                run_if: passed
+            - exec:
+                arguments:
+                  - -c
+                  - kubectl set image deployment/resizer resizer=jstrohm/resizer:${GO_PIPELINE_LABEL} -n default
+                command: /bin/bash
+                run_if: passed
