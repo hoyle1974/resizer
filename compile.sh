@@ -13,6 +13,7 @@ echo "Mountpoint: $mountpoint"
 buildah run $container pwd
 buildah run $container find .
 find .
+mkdir resizer
 cp $mountpoint/go/resizer ./resizer/resizer
 buildah unmount $mountpoint
 buildah rm $container
