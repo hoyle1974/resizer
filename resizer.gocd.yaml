@@ -30,7 +30,7 @@ pipelines:
             - exec:
                 arguments:
                   - -c
-                  - compile.sh
+                  - ./compile.sh
                 command: /bin/bash
                 run_if: passed
             - exec:
