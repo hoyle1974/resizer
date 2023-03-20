@@ -7,7 +7,7 @@ pipelines:
     display_order: -1
     materials:
       git-589ea36:
-        git: https://github.com/hoyle1974/resizer.git
+        git: http://gitea-http.gitea.svc.cluster.local:3000/gitea-admin/resizer.git
         shallow_clone: false
         auto_update: true
         branch: main
