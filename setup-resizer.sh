@@ -4,7 +4,7 @@
 
 GiteaResizer() {
 echo "------------------- Setup Resizer mirror in Gitea"
-curl -H "Content-Type: application/json" -d '{"name":"resizer-initial-setup"}' -u gitea-admin:adminadmin $GITEA_URL'/api/v1/users/gitea-admin/tokens' | tr ',' '\n' | grep sha1 | cut -f2 -d':' | cut -f2 -d'"' >> ./token
+curl -H "Content-Type: application/json" -d '{"name":"resizer-initial-setup", "scopes":["repo"]}' -u $GITEA_USERNAME:$GITEA_PASSWORD $GITEA_URL'/api/v1/users/gitea-admin/tokens' | tr ',' '\n' | grep sha1 | cut -f2 -d':' | cut -f2 -d'"' >> ./token
 TOKEN=`cat token`
 echo "Token: $TOKEN"
 rm token
@@ -15,9 +15,9 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d "{
-  \"auth_password\": \"admin\",
+  \"auth_password\": \"$GITEA_PASSWORD\",
   \"auth_token\" : \"$TOKEN\",
-  \"auth_username\": \"gitea-admin\",
+  \"auth_username\": \"$GITEA_USERNAME\",
   \"clone_addr\": \"https://github.com/hoyle1974/resizer.git\",
   \"description\": \"Resizer Microservice\",
   \"issues\": true,
