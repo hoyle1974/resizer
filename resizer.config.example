@@ -1,0 +1,6 @@
+# Rename this to resizer.config
+GITEA_USERNAME=
+GITEA_PASSWORD=
+GITEA_URL=
+GOCD_URL=
+
