@@ -58,7 +58,7 @@ metadata:
   name: resizer
 spec:
   hosts:
-  - resizer.gunsmoke.local
+  - resizer.decepticons.local
   gateways:
   - default/primary-gateway
   http:
