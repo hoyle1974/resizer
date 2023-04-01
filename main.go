@@ -70,6 +70,7 @@ func uploadFile(w http.ResponseWriter, r *http.Request) error {
 	return fmt.Errorf("No image found")
 }
 
+
 func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
@@ -85,8 +86,18 @@ func ReceiveFile(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func health(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, "ok")
+}
+
 func main() {
 	router := mux.NewRouter()
+	router.
+		Path("/").
+		Methods("GET").
+		HandlerFunc(health)
 	router.
 		Path("/resize").
 		Methods("POST").
