@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "resizer-chart.fullname" . }}
+  labels:
+    {{- include "resizer-chart.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ include "resizer-chart.fullname" . }}
+  endpoints:
+    - port: http
+      path: /metrics

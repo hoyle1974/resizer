@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ include "resizer-chart.fullname" . }}
+  labels:
+    {{- include "resizer-chart.labels" . | nindent 4 }}
+spec:
+  hosts:
+  - {{ .Values.virtualservice.host }}
+  gateways:
+  - {{ .Values.virtualservice.gateway }}
+  http:
+  - match:
+    - uri:
+        prefix: "/"
+    - port: {{ .Values.virtualservice.port }}
+    route:
+    - destination:
+        host: {{ .Values.virtualservice.internalHost }}
+        port:
+          number: {{ .Values.service.port }}
+      weight: 100
